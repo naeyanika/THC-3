@@ -86,12 +86,6 @@ if st.session_state["authentication_status"]:
             st.cache_resource.clear()
             st.success("Cache berhasil dibersihkan setelah memproses file!")
 
-elif st.session_state["authentication_status"] == False:
-    st.sidebar.error('Username/password salah')
-
-elif st.session_state["authentication_status"] == None:
-    st.sidebar.warning('Tampilan akan error jika belum login, silakan masukkan username dan password.')
-
     # Process DbSimpanan
     if 'DbSimpanan.csv' in dfs:     
             df1 = dfs['DbSimpanan.csv']
@@ -363,3 +357,8 @@ elif st.session_state["authentication_status"] == None:
                 file_name=name,
                 mime='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
             )
+elif st.session_state["authentication_status"] == False:
+    st.sidebar.error('Username/password salah')
+
+elif st.session_state["authentication_status"] == None:
+    st.sidebar.warning('Tampilan akan error jika belum login, silakan masukkan username dan password.')
