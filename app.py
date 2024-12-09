@@ -97,10 +97,10 @@ elif st.session_state["authentication_status"] == None:
 
     # Process DbSimpanan
     if 'DbSimpanan.csv' in dfs:
-            df1 = dfs['DbSimpanan.csv']
-
     else:
         st.error("File 'DbSimpanan.csv' tidak ditemukan.")
+            
+        df1 = dfs['DbSimpanan.csv']
             df1.columns = df1.columns.str.strip()
         
             temp_client_id = df1['Client ID'].copy()
