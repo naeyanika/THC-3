@@ -1,0 +1,12 @@
+credentials:
+  usernames:
+    joey:
+      name: Admin User
+      password: $2b$12$...  # Hashed password
+    audit_3:
+      name: Audit User
+      password: $2b$12$...  # Hashed password
+cookie:
+  name: thc_app_cookie
+  key: your_secret_key_here
+  expiry_days: 30
