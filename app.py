@@ -135,11 +135,11 @@ elif st.session_state["authentication_status"] == None:
         st.error("File 'THC.csv' tidak ditemukan.")
         
         # Filter N/A
-            df3_na = df3.dropna(subset=['DOCUMENT NO.'])
-            df3_blank = df3_na[df3_na['DOCUMENT NO.'].str.startswith('N/A')].copy()
+        df3_na = df3.dropna(subset=['DOCUMENT NO.'])
+        df3_blank = df3_na[df3_na['DOCUMENT NO.'].str.startswith('N/A')].copy()
 
-            st.write("THC Blank")
-            st.write(df3_blank)
+        st.write("THC Blank")
+        st.write(df3_blank)
         
         # Filter Pinjaman
             df3_cleaned = df3.dropna(subset=['DOCUMENT NO.'])
