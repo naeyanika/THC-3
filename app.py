@@ -1,97 +1,94 @@
 import streamlit as st
+import streamlit_authenticator as stauth
+import yaml
+from yaml.loader import SafeLoader
 import pandas as pd
 import numpy as np
 import io
-import yaml
-import streamlit_authenticator as stauth
 
-# Konfigurasi login
-names = ["Admin User", "audit_3"]
-usernames = ["joey", "audit_3"]
-passwords = ["komida12!", "audit_3"]  # Harus dienkripsi untuk keamanan produksi
+# Konfigurasi pengguna (biasanya disimpan di file terpisah)
+with open('config.yaml') as file:
+    config = yaml.load(file, Loader=SafeLoader)
 
-# Enkripsi password (hanya perlu dijalankan satu kali untuk mendapatkan hash)
-hashed_passwords = stauth.Hasher(passwords).generate()
+# Inisialisasi authenticator
+authenticator = stauth.Authenticate(
+    config['credentials'],
+    config['cookie']['name'],
+    config['cookie']['key'],
+    config['cookie']['expiry_days']
+)
 
-# Setup authenticator
-authenticator = stauth.Authenticate(names, usernames, hashed_passwords, "cookie_name", "signature_key", cookie_expiry_days=30)
+# Halaman login
+st.title('Login')
+name, authentication_status, username = authenticator.login('Login', 'main')
 
-# Widget login
-name, authentication_status, username = authenticator.login("Login", "main")
-
+# Penanganan status autentikasi
 if authentication_status:
+    # Jika login berhasil
     st.success(f"Selamat datang, {name}!")
+    
+    # Tambahkan tombol logout
+    authenticator.logout('Logout', 'main')
+    
     # Masukkan kode aplikasi Anda di bawah ini
     st.title("Aplikasi Pengolahan THC Link-3")
-
     st.subheader("File yang dibutuhkan:")
     st.write("1. THC.csv")
     st.write("2. DbPinjaman.csv")
     st.write("3. DbSimpanan.csv")
-
     st.subheader("Cara Pengolahan:")
     st.write("""1. Format file harus bernama dan menggunakan ekstensi csv di excelnya pilih save as *CSV UTF-8 berbatas koma atau coma delimited*, sehingga seperti ini : THC.csv, DbPinjaman.csv, DbSimpanan.csv""")
-    st.write("""2. File THC di rapikan header dan footer nya sperti pengolahan biasa, dan untuk kolom Debit dan Credit dibiarkan ada 2 dan jangan dihapus!.""")
-    st.write("""3. File DbSimpanan dan DbPinjaman, hapus header nya saja.""")
+    st.write("""2. File THC di rapikan header dan footer nya sperti pengolahan biasa, dan untuk kolom Debit dan Credit dibiarkan ada 2 dan jangan dihapus!."""")
+    st.write("""3. File DbSimpanan dan DbPinjaman, hapus header nya saja."""")
     st.write("""3. Jika penjelasan diatas kurang paham, kalian bisa lihat contohnya link dibawah ini : https://bit.ly/contoh-data-thc""")
     st.write("""4. Gunakan Format **Angka** atau **Numerik** pada **Debit** dan **Credit** di THC.""")
-
-    # Masukkan bagian kode Anda untuk proses file di sini
-    # (seperti proses upload file, pivot table, dll.)
-    # Contoh:
+    
+    # Function to format numbers
+    def format_no(no):
+        try:
+            if pd.notna(no):
+                return f'{int(no):02d}.'
+            else:
+                return ''
+        except (ValueError, TypeError):
+            return str(no)
+    
+    def format_center(center):
+        try:
+            if pd.notna(center):
+                return f'{int(center):03d}'
+            else:
+                return ''
+        except (ValueError, TypeError):
+            return str(center)
+    
+    def format_kelompok(kelompok):
+        try:
+            if pd.notna(kelompok):
+                return f'{int(kelompok):02d}'
+            else:
+                return ''
+        except (ValueError, TypeError):
+            return str(kelompok)
+    
+    # File upload
     uploaded_files = st.file_uploader("Unggah file CSV", accept_multiple_files=True)
     if uploaded_files:
-        # Proses file
+        # Read CSV files
+        dfs = {}
         for file in uploaded_files:
-            st.write(f"File {file.name} berhasil diunggah!")
-else:
-    if authentication_status == False:
-        st.error("Username atau password salah")
-    elif authentication_status == None:
-        st.warning("Silakan masukkan username dan password")
-        
-# Function to format numbers
-def format_no(no):
-    try:
-        if pd.notna(no):
-            return f'{int(no):02d}.'
-        else:
-            return ''
-    except (ValueError, TypeError):
-        return str(no)
+            df = pd.read_csv(file, delimiter=';', low_memory=False)
+            dfs[file.name] = df
+        if st.button("Bersihkan Cache"):
+            st.cache_resource.clear()
+            st.success("Cache berhasil dibersihkan setelah memproses file!")
 
-def format_center(center):
-    try:
-        if pd.notna(center):
-            return f'{int(center):03d}'
-        else:
-            return ''
-    except (ValueError, TypeError):
-        return str(center)
-
-def format_kelompok(kelompok):
-    try:
-        if pd.notna(kelompok):
-            return f'{int(kelompok):02d}'
-        else:
-            return ''
-    except (ValueError, TypeError):
-        return str(kelompok)
-
-
-# File upload
-uploaded_files = st.file_uploader("Unggah file CSV", accept_multiple_files=True)
-
-if uploaded_files:
-    # Read CSV files
-    dfs = {}
-    for file in uploaded_files:
-        df = pd.read_csv(file, delimiter=';', low_memory=False)
-        dfs[file.name] = df
-
-    if st.button("Bersihkan Cache"):
-        st.cache_resource.clear()
-        st.success("Cache berhasil dibersihkan setelah memproses file!")
+elif authentication_status == False:
+    # Jika login gagal
+    st.error('Username/password salah')
+elif authentication_status == None:
+    # Jika belum login
+    st.warning('Silakan masukkan username dan password')
 
     # Process DbSimpanan
     if 'DbSimpanan.csv' in dfs:
