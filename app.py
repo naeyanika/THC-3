@@ -96,7 +96,7 @@ elif st.session_state["authentication_status"] == None:
     st.sidebar.warning('Silakan masukkan username dan password')
 
     # Process DbSimpanan
-    if 'DbSimpanan.csv' in dfs:     
+    if 'DbSimpanan.csv'in dfs:     
             df1 = dfs['DbSimpanan.csv']
             df1.columns = df1.columns.str.strip()
             temp_client_id = df1['Client ID'].copy()
