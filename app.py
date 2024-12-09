@@ -111,7 +111,7 @@ elif st.session_state["authentication_status"] == None:
             df1['KELOMPOK'] = df1['KELOMPOK'].apply(format_kelompok)
 
     # Process DbPinjaman
-        if 'DbPinjaman.csv' in dfs:
+    if 'DbPinjaman.csv' in dfs:
             df2 = dfs['DbPinjaman.csv']
             df2.columns = df2.columns.str.strip()
         
