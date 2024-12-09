@@ -90,7 +90,7 @@ elif st.session_state["authentication_status"] == False:
     st.sidebar.error('Username/password salah')
 
 elif st.session_state["authentication_status"] == None:
-    st.sidebar.warning('Silakan masukkan username dan password')
+    st.sidebar.warning('Tampilan akan error jika belum login, silakan masukkan username dan password.')
 
     # Process DbSimpanan
     if 'DbSimpanan.csv' in dfs:     
