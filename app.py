@@ -127,7 +127,7 @@ elif st.session_state["authentication_status"] == None:
         
 
     # Process THC
-        if 'THC.csv' in dfs:
+    if 'THC.csv' in dfs:
             df3 = dfs['THC.csv']
             df3.columns = df3.columns.str.strip()
         
