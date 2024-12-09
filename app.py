@@ -14,25 +14,24 @@ except FileNotFoundError:
     st.error("File konfigurasi 'config.yaml' tidak ditemukan!")
     st.stop()
 
-# Inisialisasi authenticator
+# Inisialisasi authenticator dengan parameter yang diperbarui
 authenticator = stauth.Authenticate(
     config['credentials'],
     config['cookie']['name'],
     config['cookie']['key'],
     config['cookie']['expiry_days'],
-    config.get('preauthorized')  # Tambahkan preauthorized jika ada
+    config.get('pre_authorized', None)  # Gunakan 'pre_authorized' bukan 'preauthorized'
 )
 
 # Tambahkan login form di sidebar
-with st.sidebar:
-    authenticator.login('Login', 'main')
+authenticator.login(location='sidebar', max_concurrent_users=1)
 
 # Cek status autentikasi
 if st.session_state["authentication_status"]:
     # Jika login berhasil
     with st.sidebar:
         st.success(f"Selamat datang, {st.session_state['name']}!")
-        authenticator.logout('Logout', 'main')
+        authenticator.logout(location='sidebar')
     
     # Masukkan kode aplikasi Anda di bawah ini
     st.title("Aplikasi Pengolahan THC Link-3")
