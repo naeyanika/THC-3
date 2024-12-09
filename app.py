@@ -96,55 +96,44 @@ elif st.session_state["authentication_status"] == None:
     st.sidebar.warning('Silakan masukkan username dan password')
 
     # Process DbSimpanan
-    if 'DbSimpanan.csv' in dfs:
-    else:
-        st.error("File 'DbSimpanan.csv' tidak ditemukan.")
-            
+    if 'DbSimpanan.csv' in dfs:     
         df1 = dfs['DbSimpanan.csv']
             df1.columns = df1.columns.str.strip()
-        
             temp_client_id = df1['Client ID'].copy()
             df1['Client ID'] = df1['Account No']
             df1['Account No'] = temp_client_id
-        
             df1.columns = ['NO.', 'DOCUMENT NO.', 'ID ANGGOTA', 'NAMA', 'CENTER', 'KELOMPOK', 'HARI', 'JAM', 'SL', 'JENIS SIMPANAN'] + list(df1.columns[10:])
-        
             df1['NO.'] = df1['NO.'].apply(format_no)
             df1['CENTER'] = df1['CENTER'].apply(format_center)
             df1['KELOMPOK'] = df1['KELOMPOK'].apply(format_kelompok)
-    
+    else:
+        st.error("File 'DbSimpanan.csv' tidak ditemukan.")
+        
     # Process DbPinjaman
     if 'DbPinjaman.csv' in dfs:
             df2 = dfs['DbPinjaman.csv']
-    else:
-        st.error("File 'DbPinjaman.csv' tidak ditemukan.")
-        
             df2.columns = df2.columns.str.strip()
-        
             temp_client_id = df2['Client ID'].copy()
             df2['Client ID'] = df2['Loan No.']
             df2['Loan No.'] = temp_client_id
-        
             df2.columns = ['NO.', 'DOCUMENT NO.', 'ID ANGGOTA', 'DISBURSE', 'NAMA', 'CENTER', 'KELOMPOK', 'HARI', 'JAM', 'SL', 'JENIS PINJAMAN'] + list(df2.columns[11:])
-        
             df2['NO.'] = df2['NO.'].apply(format_no)
             df2['CENTER'] = df2['CENTER'].apply(format_center)
             df2['KELOMPOK'] = df2['KELOMPOK'].apply(format_kelompok)
-    
+    else:
+        st.error("File 'DbPinjaman.csv' tidak ditemukan.")
 
     # Process THC
     if 'THC.csv' in dfs:
             df3 = dfs['THC.csv']
-    else:
-        st.error("File 'THC.csv' tidak ditemukan.")
-        
             df3.columns = df3.columns.str.strip()
         
             df3['DOCUMENT NO.'] = df3['DOCUMENT NO.'].fillna('N/A')
             df3['TRANS. DATE'] = pd.to_datetime(df3['TRANS. DATE'], format='%d/%m/%Y', errors='coerce')
             df3['ENTRY DATE'] = pd.to_datetime(df3['ENTRY DATE'], format='%d/%m/%Y', errors='coerce')
-    
-                
+    else:
+        st.error("File 'THC.csv' tidak ditemukan.")
+        
         # Filter N/A
             df3_na = df3.dropna(subset=['DOCUMENT NO.'])
             df3_blank = df3_na[df3_na['DOCUMENT NO.'].str.startswith('N/A')].copy()
