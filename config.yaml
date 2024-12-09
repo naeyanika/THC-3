@@ -1,9 +1,9 @@
 credentials:
   usernames:
-    jsmith:
+    joey:
       name: joey
       password: $2y$10$LbJy8OF3XRVKFMGx8JdYlO99mdbtj7I0mYvB1C3Gsef7dMadhSEqK  # gunakan password yang di-hash
-    rbriggs:
+    audit:
       name: audit3
       password: $2y$10$UW3Sco0LP.8bt983.sLaJ.j0LJe7vgw7PsOkcq00kGBrMoxkocw92
 cookie:
