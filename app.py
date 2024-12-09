@@ -22,16 +22,16 @@ authenticator = stauth.Authenticate(
     config['cookie']['expiry_days']
 )
 
-# Tambahkan login di main atau sidebar
-name, authentication_status, username = authenticator.login('Login', 'main')
+# Gunakan method login() dengan benar
+authenticator.login()
 
-# Cek status autentikasi
-if authentication_status:
+# Cek status autentikasi menggunakan st.session_state
+if st.session_state["authentication_status"]:
     # Jika login berhasil
-    st.success(f"Selamat datang, {name}!")
+    st.success(f"Selamat datang, {st.session_state['name']}!")
     
     # Tambahkan tombol logout
-    authenticator.logout('Logout', 'main')
+    authenticator.logout()
     
     # Masukkan kode aplikasi Anda di bawah ini
     st.title("Aplikasi Pengolahan THC Link-3")
@@ -86,10 +86,10 @@ if authentication_status:
             st.cache_resource.clear()
             st.success("Cache berhasil dibersihkan setelah memproses file!")
 
-elif authentication_status == False:
+elif st.session_state["authentication_status"] == False:
     st.error('Username/password salah')
 
-elif authentication_status == None:
+elif st.session_state["authentication_status"] == None:
     st.warning('Silakan masukkan username dan password')
 
     # Process DbSimpanan
