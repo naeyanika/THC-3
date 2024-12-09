@@ -1,4 +1,4 @@
-import streamlit as st
+Copyimport streamlit as st
 import streamlit_authenticator as stauth
 import yaml
 from yaml.loader import SafeLoader
@@ -19,19 +19,20 @@ authenticator = stauth.Authenticate(
     config['credentials'],
     config['cookie']['name'],
     config['cookie']['key'],
-    config['cookie']['expiry_days']
+    config['cookie']['expiry_days'],
+    config.get('preauthorized')  # Tambahkan preauthorized jika ada
 )
 
-# Gunakan method login() dengan benar
-authenticator.login()
+# Tambahkan login form di sidebar
+with st.sidebar:
+    authenticator.login('Login', 'main')
 
-# Cek status autentikasi menggunakan st.session_state
+# Cek status autentikasi
 if st.session_state["authentication_status"]:
     # Jika login berhasil
-    st.success(f"Selamat datang, {st.session_state['name']}!")
-    
-    # Tambahkan tombol logout
-    authenticator.logout()
+    with st.sidebar:
+        st.success(f"Selamat datang, {st.session_state['name']}!")
+        authenticator.logout('Logout', 'main')
     
     # Masukkan kode aplikasi Anda di bawah ini
     st.title("Aplikasi Pengolahan THC Link-3")
@@ -87,10 +88,10 @@ if st.session_state["authentication_status"]:
             st.success("Cache berhasil dibersihkan setelah memproses file!")
 
 elif st.session_state["authentication_status"] == False:
-    st.error('Username/password salah')
+    st.sidebar.error('Username/password salah')
 
 elif st.session_state["authentication_status"] == None:
-    st.warning('Silakan masukkan username dan password')
+    st.sidebar.warning('Silakan masukkan username dan password')
 
     # Process DbSimpanan
     if 'DbSimpanan.csv' in dfs:
