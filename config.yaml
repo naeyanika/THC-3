@@ -11,7 +11,7 @@ credentials:
       password: $2y$10$UW3Sco0LP.8bt983.sLaJ.j0LJe7vgw7PsOkcq00kGBrMoxkocw92
       email: auditdvs@gmail.com
       roles:
-        - user
+        - admin
 cookie:
   name: some_cookie_name
   key: some_random_key  # gunakan kunci rahasia
