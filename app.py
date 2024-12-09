@@ -103,9 +103,7 @@ elif st.session_state["authentication_status"] == None:
             df1['NO.'] = df1['NO.'].apply(format_no)
             df1['CENTER'] = df1['CENTER'].apply(format_center)
             df1['KELOMPOK'] = df1['KELOMPOK'].apply(format_kelompok)
-    else:
-        st.error("File 'DbSimpanan.csv' tidak ditemukan.")
-        
+
     # Process DbPinjaman
     if 'DbPinjaman.csv' in dfs:
             df2 = dfs['DbPinjaman.csv']
@@ -117,8 +115,7 @@ elif st.session_state["authentication_status"] == None:
             df2['NO.'] = df2['NO.'].apply(format_no)
             df2['CENTER'] = df2['CENTER'].apply(format_center)
             df2['KELOMPOK'] = df2['KELOMPOK'].apply(format_kelompok)
-    else:
-        st.error("File 'DbPinjaman.csv' tidak ditemukan.")
+
 
     # Process THC
     if 'THC.csv' in dfs:
@@ -128,8 +125,6 @@ elif st.session_state["authentication_status"] == None:
             df3['DOCUMENT NO.'] = df3['DOCUMENT NO.'].fillna('N/A')
             df3['TRANS. DATE'] = pd.to_datetime(df3['TRANS. DATE'], format='%d/%m/%Y', errors='coerce')
             df3['ENTRY DATE'] = pd.to_datetime(df3['ENTRY DATE'], format='%d/%m/%Y', errors='coerce')
-    else:
-        st.error("File 'THC.csv' tidak ditemukan.")
         
         # Filter N/A
         df3_na = df3.dropna(subset=['DOCUMENT NO.'])
