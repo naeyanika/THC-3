@@ -2,23 +2,53 @@ import streamlit as st
 import pandas as pd
 import numpy as np
 import io
-import uuid
-import time
+import streamlit_authenticator as stauth
 
-st.title("Aplikasi Pengolahan THC Link-3")
+# Konfigurasi login
+names = ["Admin User", "audit_3"]
+usernames = ["joey", "audit_3"]
+passwords = ["komida12!", "audit_3"]  # Harus dienkripsi untuk keamanan produksi
 
-st.subheader("File yang dibutuhkan:")
-st.write("1. THC.csv")
-st.write("2. DbPinjaman.csv")
-st.write("3. DbSimpanan.csv")
+# Enkripsi password (hanya perlu dijalankan satu kali untuk mendapatkan hash)
+hashed_passwords = stauth.Hasher(passwords).generate()
 
-st.subheader("Cara Pengolahan:")
-st.write("""1. Format file harus bernama dan menggunakan ekstensi csv di excelnya pilih save as *CSV UTF-8 berbatas koma atau coma delimited*, sehingga seperti ini : THC.csv, DbPinjaman.csv, DbSimpanan.csv""")
-st.write("""2. File THC di rapikan header dan footer nya sperti pengolahan biasa, dan untuk kolom Debit dan Credit dibiarkan ada 2 dan jangan dihapus!.""")
-st.write("""3. File DbSimpanan dan DbPinjaman, hapus header nya saja.""")
-st.write("""3. Jika penjelasan diatas kurang paham, kalian bisa lihat contohnya link dibawah ini : https://bit.ly/contoh-data-thc""")
-st.write("""4. Gunakan Format **Angka** atau **Numerik** pada **Debit** dan **Credit** di THC.""")
+# Setup authenticator
+authenticator = stauth.Authenticate(names, usernames, hashed_passwords, "cookie_name", "signature_key", cookie_expiry_days=30)
 
+# Widget login
+name, authentication_status, username = authenticator.login("Login", "main")
+
+if authentication_status:
+    st.success(f"Selamat datang, {name}!")
+    # Masukkan kode aplikasi Anda di bawah ini
+    st.title("Aplikasi Pengolahan THC Link-3")
+
+    st.subheader("File yang dibutuhkan:")
+    st.write("1. THC.csv")
+    st.write("2. DbPinjaman.csv")
+    st.write("3. DbSimpanan.csv")
+
+    st.subheader("Cara Pengolahan:")
+    st.write("""1. Format file harus bernama dan menggunakan ekstensi csv di excelnya pilih save as *CSV UTF-8 berbatas koma atau coma delimited*, sehingga seperti ini : THC.csv, DbPinjaman.csv, DbSimpanan.csv""")
+    st.write("""2. File THC di rapikan header dan footer nya sperti pengolahan biasa, dan untuk kolom Debit dan Credit dibiarkan ada 2 dan jangan dihapus!.""")
+    st.write("""3. File DbSimpanan dan DbPinjaman, hapus header nya saja.""")
+    st.write("""3. Jika penjelasan diatas kurang paham, kalian bisa lihat contohnya link dibawah ini : https://bit.ly/contoh-data-thc""")
+    st.write("""4. Gunakan Format **Angka** atau **Numerik** pada **Debit** dan **Credit** di THC.""")
+
+    # Masukkan bagian kode Anda untuk proses file di sini
+    # (seperti proses upload file, pivot table, dll.)
+    # Contoh:
+    uploaded_files = st.file_uploader("Unggah file CSV", accept_multiple_files=True)
+    if uploaded_files:
+        # Proses file
+        for file in uploaded_files:
+            st.write(f"File {file.name} berhasil diunggah!")
+else:
+    if authentication_status == False:
+        st.error("Username atau password salah")
+    elif authentication_status == None:
+        st.warning("Silakan masukkan username dan password")
+        
 # Function to format numbers
 def format_no(no):
     try:
@@ -47,35 +77,6 @@ def format_kelompok(kelompok):
     except (ValueError, TypeError):
         return str(kelompok)
 
-# Session management with UUID
-def get_unique_session():
-    if 'session_id' not in st.session_state:
-        st.session_state.session_id = str(uuid.uuid4())
-    return st.session_state.session_id
-
-def count_active_sessions(session_time_limit=30):
-    current_time = time.time()
-    active_sessions = 0
-
-    if 'sessions' not in st.session_state:
-        st.session_state.sessions = {}
-
-    # Update session time
-    session_id = get_unique_session()
-    st.session_state.sessions[session_id] = current_time
-
-    # Count active sessions
-    for session_id, last_active in st.session_state.sessions.items():
-        if current_time - last_active < session_time_limit:
-            active_sessions += 1
-
-    return active_sessions
-
-# Set session time limit (e.g., 10 seconds for testing)
-active_sessions = count_active_sessions(session_time_limit=10)
-
-# Display active visitors on the page
-st.write(f"Active visitors now: {active_sessions}")
 
 # File upload
 uploaded_files = st.file_uploader("Unggah file CSV", accept_multiple_files=True)
