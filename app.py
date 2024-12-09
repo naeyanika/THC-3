@@ -6,9 +6,13 @@ import pandas as pd
 import numpy as np
 import io
 
-# Konfigurasi pengguna (biasanya disimpan di file terpisah)
-with open('config.yaml') as file:
-    config = yaml.load(file, Loader=SafeLoader)
+# Pastikan file config.yaml benar-benar ada dan valid
+try:
+    with open('config.yaml') as file:
+        config = yaml.load(file, Loader=SafeLoader)
+except FileNotFoundError:
+    st.error("File konfigurasi 'config.yaml' tidak ditemukan!")
+    st.stop()
 
 # Inisialisasi authenticator
 authenticator = stauth.Authenticate(
@@ -18,16 +22,16 @@ authenticator = stauth.Authenticate(
     config['cookie']['expiry_days']
 )
 
-# Gunakan login di sidebar
-authenticator.login('Login', 'sidebar')
+# Tambahkan login di main atau sidebar
+name, authentication_status, username = authenticator.login('Login', 'main')
 
-# Penanganan status autentikasi
-if st.session_state["authentication_status"]:
+# Cek status autentikasi
+if authentication_status:
     # Jika login berhasil
-    st.sidebar.success(f"Selamat datang, {st.session_state['name']}!")
+    st.success(f"Selamat datang, {name}!")
     
-    # Tambahkan tombol logout di sidebar
-    authenticator.logout('Logout', 'sidebar')
+    # Tambahkan tombol logout
+    authenticator.logout('Logout', 'main')
     
     # Masukkan kode aplikasi Anda di bawah ini
     st.title("Aplikasi Pengolahan THC Link-3")
@@ -82,11 +86,11 @@ if st.session_state["authentication_status"]:
             st.cache_resource.clear()
             st.success("Cache berhasil dibersihkan setelah memproses file!")
 
-elif st.session_state["authentication_status"] == False:
-    st.sidebar.error('Username/password salah')
+elif authentication_status == False:
+    st.error('Username/password salah')
 
-elif st.session_state["authentication_status"] == None:
-    st.sidebar.warning('Silakan masukkan username dan password')
+elif authentication_status == None:
+    st.warning('Silakan masukkan username dan password')
 
     # Process DbSimpanan
     if 'DbSimpanan.csv' in dfs:
