@@ -23,9 +23,6 @@ authenticator = stauth.Authenticate(
     config.get('pre_authorized', None)  # Gunakan 'pre_authorized' bukan 'preauthorized'
 )
 
-# Tambahkan tulisan "silakan login terlebih dahulu :)" sebelum login form
-st.write("Silakan login terlebih dahulu :)")
-
 # Tambahkan login form di sidebar
 authenticator.login(location='sidebar', max_concurrent_users=1)
 
