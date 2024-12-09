@@ -10,4 +10,3 @@ streamlit-authenticator
 bcrypt
 hashlib
 yaml
-PyYAML
