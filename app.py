@@ -119,12 +119,12 @@ elif st.session_state["authentication_status"] == None:
 
     # Process THC
     if 'THC.csv' in dfs:
-            df3 = dfs['THC.csv']
-            df3.columns = df3.columns.str.strip()
+        df3 = dfs['THC.csv']
+        df3.columns = df3.columns.str.strip()
         
-            df3['DOCUMENT NO.'] = df3['DOCUMENT NO.'].fillna('N/A')
-            df3['TRANS. DATE'] = pd.to_datetime(df3['TRANS. DATE'], format='%d/%m/%Y', errors='coerce')
-            df3['ENTRY DATE'] = pd.to_datetime(df3['ENTRY DATE'], format='%d/%m/%Y', errors='coerce')
+        df3['DOCUMENT NO.'] = df3['DOCUMENT NO.'].fillna('N/A')
+        df3['TRANS. DATE'] = pd.to_datetime(df3['TRANS. DATE'], format='%d/%m/%Y', errors='coerce')
+        df3['ENTRY DATE'] = pd.to_datetime(df3['ENTRY DATE'], format='%d/%m/%Y', errors='coerce')
         
         # Filter N/A
         df3_na = df3.dropna(subset=['DOCUMENT NO.'])
@@ -154,54 +154,54 @@ elif st.session_state["authentication_status"] == None:
         df5['CREDIT'] = df5['CREDIT'].apply(lambda x: f'Rp {float(x):,.0f}')
         
 
-            # VLOOKUP dan Filter N/A
-        if 'DbSimpanan.csv' in dfs and 'DbPinjaman.csv' in dfs:
-            # Merge untuk pinjaman
-            df4_merged = pd.merge(df4, df2[['DOCUMENT NO.', 'ID ANGGOTA', 'NAMA', 'CENTER', 'KELOMPOK', 'HARI', 'JAM', 'SL', 'JENIS PINJAMAN']], on='DOCUMENT NO.', how='left')
+    # VLOOKUP dan Filter N/A
+    if 'DbSimpanan.csv' in dfs and 'DbPinjaman.csv' in dfs:
+        # Merge untuk pinjaman
+        df4_merged = pd.merge(df4, df2[['DOCUMENT NO.', 'ID ANGGOTA', 'NAMA', 'CENTER', 'KELOMPOK', 'HARI', 'JAM', 'SL', 'JENIS PINJAMAN']], on='DOCUMENT NO.', how='left')
 
-            rename_dict = {
+        rename_dict = {
                  'PINJAMAN MIKRO BISNIS': 'PINJAMAN MIKROBISNIS',
                    }
-            df4_merged['JENIS PINJAMAN'] = df4_merged['JENIS PINJAMAN'].replace(rename_dict)
+        df4_merged['JENIS PINJAMAN'] = df4_merged['JENIS PINJAMAN'].replace(rename_dict)
             
-            # Merge untuk simpanan
-            df5_merged = pd.merge(df5, df1[['DOCUMENT NO.', 'ID ANGGOTA', 'NAMA', 'CENTER', 'KELOMPOK', 'HARI', 'JAM', 'SL', 'JENIS SIMPANAN']], on='DOCUMENT NO.', how='left')
+        # Merge untuk simpanan
+        df5_merged = pd.merge(df5, df1[['DOCUMENT NO.', 'ID ANGGOTA', 'NAMA', 'CENTER', 'KELOMPOK', 'HARI', 'JAM', 'SL', 'JENIS SIMPANAN']], on='DOCUMENT NO.', how='left')
             
-            # Filter N/A untuk pinjaman
-            df_pinjaman_na = df4_merged[pd.isna(df4_merged['NAMA'])]
+        # Filter N/A untuk pinjaman
+        df_pinjaman_na = df4_merged[pd.isna(df4_merged['NAMA'])]
             
-            # Filter N/A untuk simpanan
-            df_simpanan_na = df5_merged[pd.isna(df5_merged['NAMA'])]
+        # Filter N/A untuk simpanan
+        df_simpanan_na = df5_merged[pd.isna(df5_merged['NAMA'])]
             
 
-            st.write("Pinjaman N/A:")
-            st.write(df_pinjaman_na)
+        st.write("Pinjaman N/A:")
+        st.write(df_pinjaman_na)
             
-            st.write("Simpanan N/A:")
-            st.write(df_simpanan_na)
+        st.write("Simpanan N/A:")
+        st.write(df_simpanan_na)
 
             # PIVOT DF4
-            def sum_lists(x):
-                if isinstance(x, list):
-                    return sum(int(value.replace('Rp ', '').replace(',', '')) for value in x)
-                return x
+        def sum_lists(x):
+            if isinstance(x, list):
+                return sum(int(value.replace('Rp ', '').replace(',', '')) for value in x)
+            return x
 
-            df4_merged['TRANS. DATE'] = pd.to_datetime(df4_merged['TRANS. DATE'], format='%d/%m/%Y').dt.strftime('%d%m%Y')
-            df4_merged['DUMMY'] = df4_merged['ID ANGGOTA'] + '' + df4_merged['TRANS. DATE']
+        df4_merged['TRANS. DATE'] = pd.to_datetime(df4_merged['TRANS. DATE'], format='%d/%m/%Y').dt.strftime('%d%m%Y')
+        df4_merged['DUMMY'] = df4_merged['ID ANGGOTA'] + '' + df4_merged['TRANS. DATE']
 
-            pivot_table4 = pd.pivot_table(df4_merged,
+        pivot_table4 = pd.pivot_table(df4_merged,
                                           values=['DEBIT', 'CREDIT'],
                                           index=['ID ANGGOTA', 'DUMMY', 'NAMA', 'CENTER', 'KELOMPOK', 'HARI', 'JAM', 'SL', 'TRANS. DATE'],
                                           columns='JENIS PINJAMAN',
                                           aggfunc={'DEBIT': list, 'CREDIT': list},
                                           fill_value=0)
 
-            pivot_table4 = pivot_table4.applymap(sum_lists)
-            pivot_table4.columns = [f'{col[0]}_{col[1]}' for col in pivot_table4.columns]
-            pivot_table4.reset_index(inplace=True)
-            pivot_table4['TRANS. DATE'] = pd.to_datetime(pivot_table4['TRANS. DATE'], format='%d%m%Y').dt.strftime('%d/%m/%Y')
+        pivot_table4 = pivot_table4.applymap(sum_lists)
+        pivot_table4.columns = [f'{col[0]}_{col[1]}' for col in pivot_table4.columns]
+        pivot_table4.reset_index(inplace=True)
+        pivot_table4['TRANS. DATE'] = pd.to_datetime(pivot_table4['TRANS. DATE'], format='%d%m%Y').dt.strftime('%d/%m/%Y')
 
-            new_columns4 = [
+        new_columns4 = [
                 'DEBIT_PINJAMAN UMUM',
                 'DEBIT_PINJAMAN RENOVASI RUMAH',
                 'DEBIT_PINJAMAN SANITASI',
@@ -218,14 +218,14 @@ elif st.session_state["authentication_status"] == None:
                 'CREDIT_PINJAMAN PERTANIAN'
                 ]
 
-            for col in new_columns4:
-                if col not in pivot_table4.columns:
-                    pivot_table4[col] = 0
+        for col in new_columns4:
+            if col not in pivot_table4.columns:
+                pivot_table4[col] = 0
 
-            pivot_table4['DEBIT_TOTAL'] = pivot_table4.filter(like='DEBIT').sum(axis=1)
-            pivot_table4['CREDIT_TOTAL'] = pivot_table4.filter(like='CREDIT').sum(axis=1)
+        pivot_table4['DEBIT_TOTAL'] = pivot_table4.filter(like='DEBIT').sum(axis=1)
+        pivot_table4['CREDIT_TOTAL'] = pivot_table4.filter(like='CREDIT').sum(axis=1)
 
-            rename_dict = {
+        rename_dict = {
                 'KELOMPOK': 'KEL',
                 'DEBIT_PINJAMAN ARTA': 'Db PRT',
                 'DEBIT_PINJAMAN DT. PENDIDIKAN': 'Db DTP',
@@ -245,23 +245,23 @@ elif st.session_state["authentication_status"] == None:
                 'CREDIT_TOTAL': 'Cr Total2'
                 }
             
-            pivot_table4 = pivot_table4.rename(columns=rename_dict)
+        pivot_table4 = pivot_table4.rename(columns=rename_dict)
             
-            desired_order = [
+        desired_order = [
                 'ID ANGGOTA', 'DUMMY', 'NAMA', 'CENTER', 'KEL', 'HARI', 'JAM', 'SL', 'TRANS. DATE',
                 'Db PTN', 'Cr PTN', 'Db PRT', 'Cr PRT', 'Db DTP', 'Cr DTP', 'Db PMB', 'Cr PMB', 'Db PRR', 'Cr PRR',
                 'Db PSA', 'Cr PSA', 'Db PU', 'Cr PU', 'Db Total2', 'Cr Total2'
                 ]
 
             # Tambahkan kolom yang mungkin belum ada dalam DataFrame
-            for col in desired_order:
-                if col not in pivot_table4.columns:
-                    pivot_table4[col] = 0
+        for col in desired_order:
+            if col not in pivot_table4.columns:
+                pivot_table4[col] = 0
 
-            pivot_table4 = pivot_table4[desired_order]
+        pivot_table4 = pivot_table4[desired_order]
         
-            st.write("Pivot Table THC Pinjaman:")
-            st.write(pivot_table4)
+        st.write("Pivot Table THC Pinjaman:")
+        st.write(pivot_table4)
 
 # PIVOT DF5
     if 'df5_merged' in locals():
@@ -334,7 +334,7 @@ elif st.session_state["authentication_status"] == None:
             'Db Qurban', 'Cr Qurban', 'Db Khusus', 'Cr Khusus', 'Db Sihara', 'Cr Sihara', 'Db Pensiun', 'Cr Pensiun', 'Db Pokok', 'Cr Pokok',
             'Db SIPADAN', 'Cr SIPADAN', 'Db Sukarela', 'Cr Sukarela', 'Db Wajib', 'Cr Wajib', 'Db Total', 'Cr Total'
         ]
- # Tambahkan kolom yang mungkin belum ada dalam DataFrame
+     # Tambahkan kolom yang mungkin belum ada dalam DataFrame
         for col in desired_order:
             if col not in pivot_table5.columns:
                 pivot_table5[col] = 0
